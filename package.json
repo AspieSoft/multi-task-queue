@@ -1,7 +1,7 @@
 {
   "name": "@aspiesoft/multi-task-queue",
   "version": "1.0.0",
-  "description": "",
+  "description": "An advanced and easy to use queueing system",
   "author": "AspieSoft",
   "license": "MIT",
   "main": "index.min.js",
