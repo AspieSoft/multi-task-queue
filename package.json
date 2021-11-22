@@ -1,0 +1,15 @@
+{
+  "name": "@aspiesoft/multi-task-queue",
+  "version": "1.0.0",
+  "description": "",
+  "author": "AspieSoft",
+  "license": "MIT",
+  "main": "index.min.js",
+  "scripts": {
+    "test": "node test.js",
+    "build": "node build.js"
+  },
+  "devDependencies": {
+    "@aspiesoft/miniforge-js": "^1.1.0"
+  }
+}
