@@ -20,10 +20,16 @@ This queue was made with custom database queueing in mind. You could queue a sep
 
 ## Installation
 
+### node.js
+
 ```shell script
-
 npm install @aspiesoft/multi-task-queue
+```
 
+## cdn
+
+```html
+<script src="https://cdn.jsdelivr.net/gh/AspieSoft/multi-task-queue@1.0/index.min.js"></script>
 ```
 
 ## Usage
