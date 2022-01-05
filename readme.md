@@ -69,7 +69,7 @@ taskQueue(['coffee', 'donut'], function() {
 taskQueue('coffee', function() {
   // do anything you want here...
   console.log('java')
-})
+}, false /* non-blocking */)
 
 // add an async task
 taskQueue('coffee', async function() {
