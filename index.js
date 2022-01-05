@@ -37,37 +37,49 @@
     const readyQueue = {}
 
 
-    function readyNewType(type) {
+    function readyNewType(type, priority = false) {
       if(!types.includes(type)) {
-        types.push(type)
+        if(priority){
+          types.unshift(type)
+        }else{
+          types.push(type)
+        }
         taskQueue[type] = []
         readyQueue[type] = []
       }
     }
 
     function runTaskCB(cb, after) {
-      setImmediate(function() {
-        cb()
+      setImmediate(async function() {
+        await cb()
         after()
       })
     }
 
 
-    function addTask(type, cb, blocking = true) {
+    function addTask(type, cb, blocking = true, priority = false) {
       const id = randomID()
 
-      tasks[id] = {type, cb, blocking, state: 0}
+      tasks[id] = {type, cb, blocking, priority, state: 0}
 
       if(Array.isArray(type)) {
         tasks[id].multiType = type.length
         tasks[id].ready = 0
         for(let i = 0; i < type.length; i++) {
-          readyNewType(type[i])
-          taskQueue[type[i]].push(id)
+          readyNewType(type[i], priority)
+          if(priority){
+            taskQueue[type[i]].unshift(id)
+          }else{
+            taskQueue[type[i]].push(id)
+          }
         }
       } else {
-        readyNewType(type)
-        taskQueue[type].push(id)
+        readyNewType(type, priority)
+        if(priority) {
+          taskQueue[type].unshift(id)
+        } else {
+          taskQueue[type].push(id)
+        }
       }
     }
 
@@ -79,14 +91,22 @@
       if(!readyQueue[type].length || !tasks[taskQueue[type][0]].blocking) {
         let id = taskQueue[type].shift()
         if(!tasks[id].multiType) {
-          readyQueue[type].push(id)
+          if(tasks[id].priority){
+            readyQueue[type].unshift(id)
+          }else{
+            readyQueue[type].push(id)
+          }
           if(!tasks[id].blocking) {
             readyNextTask(type)
           }
         } else {
           tasks[id].ready++
           if(tasks[id].ready >= tasks[id].multiType) {
-            readyQueue[type].push(id)
+            if(tasks[id].priority) {
+              readyQueue[type].unshift(id)
+            } else {
+              readyQueue[type].push(id)
+            }
             if(!tasks[id].blocking) {
               readyNextTask(type)
             }

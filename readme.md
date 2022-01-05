@@ -39,11 +39,11 @@ npm install @aspiesoft/multi-task-queue
 // require only if using node.js
 const multiTaskQueue = require('@aspiesoft/multi-task-queue');
 
-const queue = multiTaskQueue(10 /* interval in milliseconds for the queue to run the next task */)
+const taskQueue = multiTaskQueue(10 /* interval in milliseconds for the queue to run the next task */)
 
 
 // you can make more than one queue instance (these queues are isolated)
-const queue2 = multiTaskQueue(100)
+const taskQueue2ndInstance = multiTaskQueue(100)
 
 
 
@@ -65,11 +65,36 @@ taskQueue(['coffee', 'donut'], function() {
   console.log('coffee and donuts')
 })
 
-// add a task to the coffee queue
+// add another task to the coffee queue
 taskQueue('coffee', function() {
   // do anything you want here...
   console.log('java')
 })
+
+// add an async task
+taskQueue('coffee', async function() {
+  // do anything you want here...
+  await someAsyncFunction();
+  console.log('someone spilled the coffee')
+})
+
+
+// add a non blocking task
+taskQueue('coffee', function() {
+  // do anything you want here...
+  console.log('java anytime, I can wait')
+}, false /* blocking = false */)
+
+// add a priority task
+taskQueue('coffee', function() {
+  // do anything you want here...
+  console.log('Need morning coffee ASAP!')
+}, true /* blocking = true */, false /* priority = true */)
+
+
+// by default
+// blocking = true
+// priority = false
 
 
 // clear and reset the queue
