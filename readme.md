@@ -89,7 +89,7 @@ taskQueue('coffee', function() {
 taskQueue('coffee', function() {
   // do anything you want here...
   console.log('Need morning coffee ASAP!')
-}, true /* blocking = true */, false /* priority = true */)
+}, true /* blocking = true */, true /* priority = true */)
 
 
 // by default
