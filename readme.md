@@ -31,13 +31,13 @@ A priority task will Not stop a currently running task, it will still wait its t
 ### node.js
 
 ```shell script
-npm install @aspiesoft/multi-task-queue
+npm install multi-task-queue
 ```
 
 ## cdn
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/AspieSoft/multi-task-queue@1.2.0/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/AspieSoft/multi-task-queue@1.3.0/index.min.js"></script>
 ```
 
 ## Usage
@@ -45,7 +45,7 @@ npm install @aspiesoft/multi-task-queue
 ```JavaScript
 
 // require only if using node.js
-const multiTaskQueue = require('@aspiesoft/multi-task-queue');
+const multiTaskQueue = require('multi-task-queue');
 
 const taskQueue = multiTaskQueue(10 /* interval in milliseconds for the queue to run the next task */)
 
