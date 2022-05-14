@@ -59,6 +59,9 @@ taskQueue(['coffee', 'donut'], function() {
 })
 
 
+console.log(taskQueue.len('coffee'))
+
+
 setTimeout(function(){
   taskQueue.clear()
 }, 2000)

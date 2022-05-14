@@ -20,7 +20,7 @@
     if(crypto) {
       return (randIndex++).toString() + crypto.randomBytes(16).toString('hex')
     }
-    return (randIndex++).toString() + random().toString()
+    return (randIndex++).toString() + Math.random().toString()
   }
 
   setInterval(function(){
@@ -35,6 +35,25 @@
 
     const taskQueue = {}
     const readyQueue = {}
+
+    const taskLen = {}
+    const taskRunLen = {}
+
+    function changeTaskLength(type, change = 1, run = false){
+      if(run){
+        if(taskRunLen[type] === undefined){
+          taskRunLen[type] = change
+        }else{
+          taskRunLen[type] += change
+        }
+        return
+      }
+      if(taskLen[type] === undefined){
+        taskLen[type] = change
+      }else{
+        taskLen[type] += change
+      }
+    }
 
 
     function readyNewType(type, priority = false) {
@@ -57,7 +76,32 @@
     }
 
 
-    function addTask(type, cb, blocking = true, priority = false) {
+    function addTask(type, cb, {blocking, priority} = {blocking: true, priority: false}) {
+      if(typeof arguments[2] === 'boolean'){
+        blocking = arguments[2]
+        priority = !!arguments[3]
+      }else if(typeof arguments[2] === 'function'){
+        if(cb === null){
+          blocking = false
+          priority = true
+        }else if(typeof cb === 'object'){
+          if(Array.isArray(cb)){
+            blocking = !!cb[0]
+            priority = !!cb[1]
+          }else{
+            blocking = !!cb.blocking
+            priority = !!cb.priority
+          }
+        }else if(typeof cb === 'boolean'){
+          blocking = cb
+          priority = cb
+        }else{
+          blocking = true
+          priority = false
+        }
+        cb = arguments[2]
+      }
+
       const id = randomID()
 
       tasks[id] = {type, cb, blocking, priority, state: 0}
@@ -66,6 +110,7 @@
         tasks[id].multiType = type.length
         tasks[id].ready = 0
         for(let i = 0; i < type.length; i++) {
+          changeTaskLength(type[i], 1)
           readyNewType(type[i], priority)
           if(priority){
             taskQueue[type[i]].unshift(id)
@@ -74,6 +119,7 @@
           }
         }
       } else {
+        changeTaskLength(type, 1)
         readyNewType(type, priority)
         if(priority) {
           taskQueue[type].unshift(id)
@@ -84,7 +130,7 @@
     }
 
     function readyNextTask(type) {
-      if(!taskQueue[type].length) {
+      if(!taskQueue[type] || !taskQueue[type].length) {
         return
       }
 
@@ -119,6 +165,10 @@
 
 
     function runNextTask(type) {
+      if(!readyQueue[type]){
+        return
+      }
+
       for(let i = 0; i < readyQueue[type].length; i++) {
         let id = readyQueue[type][i]
 
@@ -128,8 +178,13 @@
 
         if(tasks[id].state === 0) {
           tasks[id].state = 1
+          changeTaskLength(type, 1, true)
           runTaskCB(tasks[id].cb, function() {
-            tasks[id].state = 2
+            changeTaskLength(type, -1, true)
+            changeTaskLength(type, -1)
+            if(tasks[id]){
+              tasks[id].state = 2
+            }
           })
         } else if(tasks[id].state === 2) {
           tasks[id].state = 3
@@ -147,16 +202,42 @@
 
     setInterval(function() {
       for(let i = 0; i < types.length; i++) {
-        if(!readyQueue[types[i]].length) {
+        if(!readyQueue[types[i]] || !readyQueue[types[i]].length) {
           readyNextTask(types[i])
         }
         runNextTask(types[i])
       }
-    }, intervalMS);
+    }, intervalMS)
 
 
     const func = addTask
-    func.clear = function() {
+    func.clear = function(type) {
+      if(Array.isArray(type)){
+        for(let i = 0; i < type.length; i++){
+          delete taskQueue[type[i]]
+          delete readyQueue[type[i]]
+          for(let j in tasks) {
+            if(Array.isArray(tasks[j].type) && tasks[j].type.includes(type[i])){
+              delete tasks[j]
+            }else if(tasks[j].type === type[i]){
+              delete tasks[j]
+            }
+          }
+        }
+        return
+      }else if(type){
+        delete taskQueue[type]
+        delete readyQueue[type]
+        for(let i in tasks) {
+          if(Array.isArray(tasks[i].type) && tasks[i].type.includes(type)){
+            delete tasks[i]
+          }else if(tasks[i].type === type){
+            delete tasks[i]
+          }
+        }
+        return
+      }
+
       for(let i = 0; i < types.length; i++) {
         delete taskQueue[types[i]]
         delete readyQueue[types[i]]
@@ -165,6 +246,38 @@
         delete tasks[i]
       }
       types.splice(0, types.length)
+    }
+    func.len = function(type, running = false) {
+      if(type === true){
+        [type, running] = [running, type]
+      }
+
+      if(!type){
+        let len = 0
+        for(let i = 0; i < types.length; i++){
+          if(running){
+            len += (taskRunLen[types[i]] || 0)
+          }else{
+            len += (taskLen[types[i]] || 0)
+          }
+        }
+        return len
+      }else if(Array.isArray(type)){
+        let len = 0
+        for(let i = 0; i < type.length; i++){
+          if(running){
+            len += (taskRunLen[type[i]] || 0)
+          }else{
+            len += (taskLen[type[i]] || 0)
+          }
+        }
+        return len
+      }
+
+      if(running){
+        return taskRunLen[type] || 0
+      }
+      return taskLen[type] || 0
     }
     return func
   }
