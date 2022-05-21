@@ -108,7 +108,6 @@ taskQueue('coffee', function() {
 // by default
 // blocking = true
 // priority = false
-// manual = false (new)
 
 
 // new ways of setting blocking and priority (this module is backwards compatable with the old method)
