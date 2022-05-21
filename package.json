@@ -1,6 +1,6 @@
 {
   "name": "@aspiesoft/multi-task-queue",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "An advanced and easy to use queueing system",
   "author": "AspieSoft",
   "license": "MIT",
@@ -9,6 +9,22 @@
     "test": "node test.js",
     "build": "node build.js"
   },
+  "keywords": [
+    "nodejs",
+    "javascript",
+    "js",
+    "express",
+    "npm",
+    "queue",
+    "multi-task-queue",
+    "multi",
+    "function",
+    "async",
+    "synchronized",
+    "non-blocking",
+    "blocking",
+    "priority"
+  ],
   "devDependencies": {
     "@aspiesoft/miniforge-js": "^1.1.0"
   }

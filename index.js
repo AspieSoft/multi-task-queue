@@ -68,15 +68,19 @@
       }
     }
 
-    function runTaskCB(cb, after) {
+    function runTaskCB(cb, after, manual = undefined) {
       setImmediate(async function() {
-        await cb()
-        after()
+        if(manual || (manual !== false && cb.length > 0)){ /* auto detect if argument was requested */
+          await cb(after)
+        }else{
+          await cb(() => {})
+          after()
+        }
       })
     }
 
 
-    function addTask(type, cb, {blocking, priority} = {blocking: true, priority: false}) {
+    function addTask(type, cb, {blocking, priority, manual} = {blocking: true, priority: false, manual: undefined}) {
       if(typeof arguments[2] === 'boolean'){
         blocking = arguments[2]
         priority = !!arguments[3]
@@ -88,9 +92,19 @@
           if(Array.isArray(cb)){
             blocking = !!cb[0]
             priority = !!cb[1]
+            if(cb[2] === true){
+              manual = true
+            }else if(cb[2] === false){
+              manual = false
+            }
           }else{
             blocking = !!cb.blocking
             priority = !!cb.priority
+            if(cb.manual === true){
+              manual = true
+            }else if(cb.manual === false){
+              manual = false
+            }
           }
         }else if(typeof cb === 'boolean'){
           blocking = cb
@@ -102,9 +116,12 @@
         cb = arguments[2]
       }
 
+      if(blocking === undefined){blocking = true}
+      if(priority === undefined){priority = false}
+
       const id = randomID()
 
-      tasks[id] = {type, cb, blocking, priority, state: 0}
+      tasks[id] = {type, cb, state: 0, blocking, priority, manual}
 
       if(Array.isArray(type)) {
         tasks[id].multiType = type.length
@@ -185,7 +202,7 @@
             if(tasks[id]){
               tasks[id].state = 2
             }
-          })
+          }, tasks[id].manual)
         } else if(tasks[id].state === 2) {
           tasks[id].state = 3
           readyQueue[type].splice(i, 1)

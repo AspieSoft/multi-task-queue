@@ -26,6 +26,11 @@ Tasks are non priority by default. This means new tasks are added to the end of 
 When a task is set as a priority, it will be added to the front of the queue.
 A priority task will Not stop a currently running task, it will still wait its turn, but cut in front of the other tasks that are still waiting in the queue.
 
+## What's New
+
+- Added "manual" option to use a "next" function to run the next task in the queue.
+- If the "manual" option is not explicitly set to false, this module will auto detect if your function requests an argument, and set the functions "manual" option to true if it does.
+
 ## Installation
 
 ### node.js
@@ -37,7 +42,7 @@ npm install multi-task-queue
 ## cdn
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/AspieSoft/multi-task-queue@1.3.0/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/AspieSoft/multi-task-queue@1.3.1/index.min.js"></script>
 ```
 
 ## Usage
@@ -103,6 +108,7 @@ taskQueue('coffee', function() {
 // by default
 // blocking = true
 // priority = false
+// manual = false (new)
 
 
 // new ways of setting blocking and priority (this module is backwards compatable with the old method)
@@ -136,6 +142,24 @@ taskQueue('coffee', true, function() {
 taskQueue('coffee', false, function() {
   console.log('maybe some more coffee later')
 })
+
+
+// new option to manually finish queue
+taskQueue('icecream', function(next) {
+  console.log('ice cream')
+  next()
+}, {manual: true /* setting this to true means you need to run the "next" function when your done */})
+
+taskQueue('icecream', function(next) {
+  console.log('extra ice cream')
+  // next() // not running "next" should prevent the next task
+}, {manual: true})
+
+taskQueue('icecream', function(next) {
+  // this function should never be called
+  console.log('no more ice cream :(')
+  next()
+}) /* note: if manual in undefined, this module will auto detect if your function accepts an argument */
 
 
 // clear and reset the queue

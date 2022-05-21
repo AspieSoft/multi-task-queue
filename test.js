@@ -17,45 +17,65 @@ let finished = 0;
 
 taskQueue('donut', function() {
   console.log('donut')
-  finished++;
+  finished++
 })
 
 taskQueue('coffee', async function(){
   await sleep(200);
   console.log('coffee')
-  finished++;
+  finished++
 })
 
 taskQueue('coffee', async function() {
   await sleep(100);
   console.log('java')
-  finished++;
+  finished++
 })
 
 taskQueue('coffee', async function() {
   await sleep(300);
   console.log('important coffee')
-  finished++;
+  finished++
 }, true, true)
 
 taskQueue(['coffee', 'donut', 'cupcake'], function() {
   console.log('coffee, donuts, and cupcakes')
-  finished++;
+  finished++
 })
 
 taskQueue('cupcake', function() {
   console.log('cupcake')
-  finished++;
+  finished++
 })
 
 taskQueue(['burgers', 'fries'], function() {
   console.log('burgers and fries')
-  finished++;
+  finished++
 })
 
 taskQueue(['coffee', 'donut'], function() {
   console.log('coffee and donuts')
-  finished++;
+  finished++
+})
+
+
+taskQueue('icecream', function(next) {
+  console.log('ice cream')
+  finished++
+  next()
+}, {manual: true})
+
+taskQueue('icecream', function(next) {
+  console.log('extra ice cream')
+  finished++
+  // next() // not running "next" should prevent the next task
+}, {manual: true})
+
+taskQueue('icecream', function(next) {
+  // this function should never be called
+  console.log('no more ice cream :(')
+  finished++
+  next()
 })
 
 
@@ -68,8 +88,11 @@ setTimeout(function(){
 
 setTimeout(function() {
   console.log('-----');
-  if(finished < 8){
+  if(finished < 10){
     let err = new Error('Failed To Finish Queue During Test!')
+    throw err
+  }else if(finished > 10){
+    let err = new Error('Too Many Items Finish In Queue During Test!')
     throw err
   }else{
     console.log('Finished Queue Test Successfully!')
