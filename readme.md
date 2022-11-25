@@ -8,7 +8,7 @@
 ![npm downloads](https://img.shields.io/npm/dm/multi-task-queue)
 ![jsDelivr hits (GitHub)](https://img.shields.io/jsdelivr/gh/hm/aspiesoft/multi-task-queue)
 
-[![square](https://img.shields.io/badge/buy%20me%20a%20coffee-square-blue)](https://buymeacoffee.aspiesoft.com/)
+[![donation link](https://img.shields.io/badge/buy%20me%20a%20coffee-paypal-blue)](https://paypal.me/shaynejrtaylor?country.x=US&locale.x=en_US)
 
 ## An advanced and easy to use queueing system
 
